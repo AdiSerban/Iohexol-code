@@ -1,0 +1,155 @@
+###    CALCUL DE L'Iohexol   ############
+###    Adrian ################
+
+
+rm(list=ls()) #efface objets en mémoire
+setwd("//Sipbprod\\masslynx$\\")
+
+#### Chargement des librairies ####
+
+library(zipfR) # Fonction Gamma incomplète
+library(MASS) # Simulation loi gaussienne multivariée(mvnorm) et inversion matrice variance-covar (ginv)
+library(stringr)
+# Load the TclTk package
+require(tcltk) # Affichage des fenêtres de validations
+library(tkrplot)
+tclRequire("Tktable")
+require(stats)
+
+	
+
+####### Recuperation des donnees #######
+
+dt = 0.01
+time = seq(0,12,dt)
+NbrIt = 10 #Nombre d'itération de la routine d'optimisation
+Seuil = 50 #Seuil d'invalidation automatique
+
+# Importation et mise en forme des données#V1 numero Glims, V2 Nom, V3 prenom, V4 age, V5 delay de prelevement,
+# V6 hauteur, V7 parreil que V5;V8 poids, V9 valeur mesure.##
+
+
+test<-read.csv("./T_CL_Iohexol.csv",skip=6,na.strings=".",header=F,sep=",",quote="")
+
+test$V1<-paste(str_sub(test$V1,2,5),1,str_sub(test$V1,7,12),sep="")
+test$V4<-as.numeric(test$V4)
+test$V5<-paste(str_sub(test$V5,2,4),str_sub(test$V5,7,str_length(test$V5)-4),sep="")
+
+test$V6<-as.numeric(str_sub(test$V6,1,str_length(test$V6)-1))
+test$V7<-as.numeric(paste(str_sub(test$V7,2,5),str_sub(test$V7,7,str_length(test$V7)-4),sep=""))
+test$V8<-as.numeric(str_sub(test$V8,1,str_length(test$V8)-1))
+test$V9<-as.numeric(str_sub(test$V9,1,str_length(test$V9)-0))
+
+
+
+CodeID <- paste(str_sub(test$V1,1,4),"C",str_sub(test$V1,6,12),sep="") # Numéro de dossier avec C
+CodeID <- unique(CodeID)
+
+colnames(test)<-c("ID","NOM","PRENOM","Age","Time","Taille","Time","Poids","Y")
+tmp<-strptime(test$Time,"%H:%M")
+View(test)
+#rajut d'une ligne suplimentaire pour pas anuler le dernier patient##
+Vector_suplimentaire<-c(99991999999,1,1,1,1,1,1,1,1)
+Vector_suplimentaire<-as.numeric(Vector_suplimentaire)
+test<-rbind(test,Vector_suplimentaire)
+test<-as.data.frame(test)
+
+m<-NROW(test$ID)
+Time<-c()
+Dose<-c()
+RClbm<-c()
+RClbmn<-c()
+
+Results<-c()
+dim(results)<-c(1,6)
+
+i<-1
+
+for (i in 1:(m+1))
+{
+if(test[i+1,1]==test[i,1])
+{
+Time<-append(Time,test[i+1,5])
+Dose<-append(Dose,test[i+1,9])
+
+}
+ 
+if(test[i+1,1]!=test[i,1])
+{
+ID<-test[i,1]
+Nom<-test[i,2]
+Prenom<-test[i,3]
+Age<-test[i,4]
+Taille<-test[i,6]
+Poids<-test[i,8]
+#patient<-c(Time,Dose,Taille,Poids)
+#results<-append(results,patient)
+Dose<-as.numeric(Dose)
+Time<-as.numeric(Time)
+Poids<-as.numeric(Poids)
+Taille<-as.numeric(Taille)
+#code iohexol classique
+Conc<-c(Dose)
+Time<-c(Time)
+LNconc<-log(Conc)
+reg<-lm(LNconc~Time)
+coeff=coefficients(reg)
+origine<-exp(round(coeff[1],6))
+pente<-round(coeff[2],6)
+AUC=origine/(abs(pente))
+#Administration de XmL d’omnipaque Y (240mg soit 518mg iohexol / omnipaque 180 soit 388 mg /  omnipaque 300 soit 647 mg / 350 soit 755 mg)
+#Définir le volume d’omnipaque utilisé
+X=5
+#Définir le type d’omnipaque utilisé
+Y=240
+dose=X*518/240*Y
+#calcul de la clairance en mL/min
+CL=dose*1000/AUC
+#Calcul de la SC selon Gehan et Georges
+BSA=0.0235*((Taille)^0.42246)*((Poids)^0.51456)
+#Correction de Brochner-Mortensen parce qu’on évalue uniquement la deuxième exponentielle
+CLBM=0.990778*CL-0.001218*(CL^2)
+CLBM
+CLBM.calc <-CLBM
+#Clairance normalisée à la surface corporelle en mL/min/1.73m²
+CLBMnormSC=CLBM*(1.73/BSA)
+CLBMnormSC
+Patient<-c(ID,Nom,Prenom,Age,CLBM,CLBMnormSC)
+dim(Patient)<-c(1,6)
+
+Results<-rbind(Results,Patient)
+Time<-c()
+Dose<-c()
+
+}
+}
+
+colnames(Results)<-c("ID","Nom","Prenom","Age","CLBM","CLBMnormSC")
+Results<-cbind(Results,CodeID)
+View(Results)
+Results<-as.data.frame(Results)
+n<-NROW(Results$ID)
+
+
+### Création fichier text ###
+#sink("//Sipbprod\\masslynx$\\Clearance_Iohexol.txt") # génération de fichier sur le serveur
+sink("lims.txt")
+for (i in 1:20){
+	cat("\n") ## on saute 20 ligne
+}
+for (i in 1:n){
+	
+	cat(paste(Results[i,7],0,6,sep = "" ),"\n") ## écriture du num de dossier
+	cat(paste(1,",CLBM",",,,,,,,",Results[i,5],sep = ""),"\n") ## écriture du résulat au neuvième espace
+	cat("\n") ## on saute une ligne
+	cat(paste(2,",CLBMn",",,,,,,,",Results[i,6],sep = ""),"\n") ## écriture du résulat au neuvième espace
+	cat("\n") ## on saute une ligne
+	
+	
+}
+
+sink()
+
+##############################
+
+
