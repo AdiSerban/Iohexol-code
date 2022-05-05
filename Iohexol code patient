@@ -1,38 +1,162 @@
 #R code for Iohexol clearance 
+#before the first use it must be installed tha package svDialogs
+rm(list=ls())
+library(svDialogs)
 
- library(svDialogs)
- 
- Test <- dlgInput(message="Wich test? For volume tap 1 or for syringe weight tap 2")
+syringe_weight_before <-0
+syringe_weight_after <-0
+Height<-0
+Weight<-0
+Omnipaque_volume<-0
+Concentration3<-0
+Concentration4<-0
+Concentration5<-0
+Time3<-0
+Time4<-0
+Time5<-0
+
+
+Test <- dlgInput(message="Administered iohexol calculation: Enter 1 for iohexol injected volume or 2 for syringes weight before and after injection")
 Test <- as.numeric(Test[["res"]])
 
-if ( Test == 1 )
+Ped <-dlgInput(message="For pediatric patient with a known BSA enter 1, for height and weight enter 2")
+Ped <- as.numeric(Ped[["res"]])
+
+Concnr <-dlgInput(message="How many concentration do you use. Enter a number from 2 to 5")
+Concnr <- as.numeric(Concnr[["res"]])
+
+if ( Ped == 2 )
+
 {
+
 Height <- dlgInput("Patient height in cm")
 Height<-as.numeric(Height[["res"]])
 Weight <- dlgInput("Patient weight in kg")
 Weight<-as.numeric(Weight[["res"]])
-Omnipaque_type <- dlgInput("Wich type of Omnipaque?       240mg/mL omnipaque     180mg/mL omnipaque   300mg/mL omnipaque  350mg/mL omnipaque")
-Omnipaque_type <-as.numeric(Omnipaque_type[["res"]]) 
-Omnipaque_volume <- dlgInput("Omnipaque volume of injection")
-Omnipaque_volume <-as.numeric(Omnipaque_volume[["res"]])
-Concentration1 <- dlgInput("Concentration 1 in mg/L")
+#BSA calculation by Gehan and Georges
+BSA=0.0235*((Height)^0.42246)*((Weight)^0.51456)
+
+}
+
+
+if ( Ped == 1 )
+{
+BSA <- dlgInput("BSA?")
+BSA<-as.numeric(BSA[["res"]]) 
+}
+
+if ( Concnr == 2 )
+{
+
+Concentration1 <- dlgInput("Please enter the measured iohexol concentration at the first sampling time (in mg/L) ")
 Concentration1<-as.numeric(Concentration1[["res"]])
-Time1 <- dlgInput("Time1 in minutes")
+Time1 <- dlgInput("Please enter the exact sampling time after iohexol administration at the first sampling time (in minuts). Superior of 120")
 Time1<-as.numeric(Time1[["res"]])
-Concentration2 <- dlgInput("Concentration 2")
+Concentration2 <- dlgInput("Please enter the measured iohexol concentration at the second sampling time (in mg/L)")
 Concentration2<-as.numeric(Concentration2[["res"]])
-Time2 <- dlgInput("Time2")
+Time2 <- dlgInput("Please enter the exact sampling time after iohexol administration at the second sampling time (in minuts)")
 Time2<-as.numeric(Time2[["res"]])
-Concentration3 <- dlgInput("Concentration 3")
+
+Conc<-c(Concentration1,Concentration2)
+Time<-c(Time1,Time2)
+
+
+}
+
+
+if ( Concnr == 3 )
+{
+
+Concentration1 <- dlgInput("Please enter the measured iohexol concentration at the first sampling time (in mg/L) ")
+Concentration1<-as.numeric(Concentration1[["res"]])
+Time1 <- dlgInput("Please enter the exact sampling time after iohexol administration at the first sampling time (in minuts). Superior of 120")
+Time1<-as.numeric(Time1[["res"]])
+Concentration2 <- dlgInput("Please enter the measured iohexol concentration at the second sampling time (in mg/L)")
+Concentration2<-as.numeric(Concentration2[["res"]])
+Time2 <- dlgInput("Please enter the exact sampling time after iohexol administration at the second sampling time (in minuts)")
+Time2<-as.numeric(Time2[["res"]])
+Concentration3 <- dlgInput("Please enter the measured iohexol concentration at the third sampling time (in mg/L)")
 Concentration3<-as.numeric(Concentration3[["res"]])
-Time3 <- dlgInput("Time3")
+Time3 <- dlgInput("Please enter the exact sampling time after iohexol administration at the third sampling time (in minuts)")
 Time3<-as.numeric(Time3[["res"]])
-Concentration4 <- dlgInput("Concentration 4")
+
+Conc<-c(Concentration1,Concentration2,Concentration3)
+Time<-c(Time1,Time2,Time3)
+
+
+}
+
+
+if ( Concnr == 4 )
+{
+
+Concentration1 <- dlgInput("Please enter the measured iohexol concentration at the first sampling time (in mg/L) ")
+Concentration1<-as.numeric(Concentration1[["res"]])
+Time1 <- dlgInput("Please enter the exact sampling time after iohexol administration at the first sampling time (in minuts). Superior of 120")
+Time1<-as.numeric(Time1[["res"]])
+Concentration2 <- dlgInput("Please enter the measured iohexol concentration at the second sampling time (in mg/L)")
+Concentration2<-as.numeric(Concentration2[["res"]])
+Time2 <- dlgInput("Please enter the exact sampling time after iohexol administration at the second sampling time (in minuts)")
+Time2<-as.numeric(Time2[["res"]])
+Concentration3 <- dlgInput("Please enter the measured iohexol concentration at the third sampling time (in mg/L)")
+Concentration3<-as.numeric(Concentration3[["res"]])
+Time3 <- dlgInput("Please enter the exact sampling time after iohexol administration at the third sampling time (in minuts)")
+Time3<-as.numeric(Time3[["res"]])
+Concentration4 <- dlgInput("Please enter the measured iohexol concentration at the fourth sampling time (in mg/L)")
 Concentration4<-as.numeric(Concentration4[["res"]])
-Time4 <- dlgInput("Time4")
+Time4 <- dlgInput("Please enter the exact sampling time after iohexol administration at the fourth sampling time (in minuts)")
 Time4<-as.numeric(Time4[["res"]])
+
+
 Conc<-c(Concentration1,Concentration2,Concentration3,Concentration4)
 Time<-c(Time1,Time2,Time3,Time4)
+
+}
+
+
+
+if ( Concnr == 5 )
+{
+
+Concentration1 <- dlgInput("Please enter the measured iohexol concentration at the first sampling time (in mg/L) ")
+Concentration1<-as.numeric(Concentration1[["res"]])
+Time1 <- dlgInput("Please enter the exact sampling time after iohexol administration at the first sampling time (in minuts). Superior of 120")
+Time1<-as.numeric(Time1[["res"]])
+Concentration2 <- dlgInput("Please enter the measured iohexol concentration at the second sampling time (in mg/L)")
+Concentration2<-as.numeric(Concentration2[["res"]])
+Time2 <- dlgInput("Please enter the exact sampling time after iohexol administration at the second sampling time (in minuts)")
+Time2<-as.numeric(Time2[["res"]])
+Concentration3 <- dlgInput("Please enter the measured iohexol concentration at the third sampling time (in mg/L)")
+Concentration3<-as.numeric(Concentration3[["res"]])
+Time3 <- dlgInput("Please enter the exact sampling time after iohexol administration at the third sampling time (in minuts)")
+Time3<-as.numeric(Time3[["res"]])
+Concentration4 <- dlgInput("Please enter the measured iohexol concentration at the fourth sampling time (in mg/L)")
+Concentration4<-as.numeric(Concentration4[["res"]])
+Time4 <- dlgInput("Please enter the exact sampling time after iohexol administration at the fourth sampling time (in minuts)")
+Time4<-as.numeric(Time4[["res"]])
+Concentration5 <- dlgInput("Please enter the measured iohexol concentration at the fifth sampling time (in mg/L)")
+Concentration5 <-as.numeric(Concentration5[["res"]])
+Time5 <- dlgInput("Please enter the exact sampling time after iohexol administration at the fifth sampling time (in minuts)")
+Time5 <-as.numeric(Time5[["res"]])
+
+
+Conc<-c(Concentration1,Concentration2,Concentration3,Concentration4,Concentration5)
+Time<-c(Time1,Time2,Time3,Time4,Time5)
+
+}
+
+
+
+
+
+if ( Test == 1 )
+{
+
+Omnipaque_type <- dlgInput("Which omnipaque concentration is used ? Enter 180 or 240 or 300 or 350 for respectively concentration in mg/mL")
+Omnipaque_type <-as.numeric(Omnipaque_type[["res"]])
+Omnipaque_volume <- dlgInput("Omnipaque volume of injection en mL")
+Omnipaque_volume <-as.numeric(Omnipaque_volume[["res"]])
+
 
 LNconc<-log(Conc)
 require(stats)
@@ -49,41 +173,29 @@ Y=Omnipaque_type
 dose=X*518/240*Y
 #clearance calculation in mL/min
 CL=dose*1000/AUC
-#BSA calculation by Gehan and Georges
-BSA=0.0235*((Height)^0.42246)*((Weight)^0.51456)
+
 #Brochner-Mortensen correction (only the second exponential is evaluated)
 CLBM=0.990778*CL-0.001218*(CL^2)
+
 #BSA normalized clearance mL/min/1.73m²
 CLBMnormSC=CLBM*(1.73/BSA)
+
 
 
 }
 
 if ( Test == 2)
 {
-Omnipaque_type <- dlgInput("Wich type of Omnipaque?          240mg/mL omnipaque       180mg/mL omnipaque      300mg/mL omnipaque      350mg/mL omnipaque")
+Omnipaque_type <- dlgInput("Which omnipaque concentration is used ? Enter 180 or 240 or 300 or 350 for respectively concentration in mg/mL")
 Omnipaque_type <-as.numeric(Omnipaque_type[["res"]]) 
-BSA <- dlgInput("BSA?")
-BSA<-as.numeric(BSA[["res"]]) 
+
+
 syringe_weight_before <- dlgInput("Syringe weight before in grams ")
 syringe_weight_before <-as.numeric(syringe_weight_before[["res"]]) 
 syringe_weight_after <- dlgInput("Syringe weight after in grams")
 syringe_weight_after <-as.numeric(syringe_weight_after[["res"]]) 
-Concentration1 <- dlgInput("Concentration 1 in mg/L")
-Concentration1<-as.numeric(Concentration1[["res"]])
-Time1 <- dlgInput("Time1 in minutes")
-Time1<-as.numeric(Time1[["res"]])
-Concentration2 <- dlgInput("Concentration 2")
-Concentration2<-as.numeric(Concentration2[["res"]])
-Time2 <- dlgInput("Time2")
-Time2<-as.numeric(Time2[["res"]])
-Concentration3 <- dlgInput("Concentration 3")
-Concentration3<-as.numeric(Concentration3[["res"]])
-Time3 <- dlgInput("Time3")
-Time3<-as.numeric(Time3[["res"]])
-Conc<-c(Concentration1,Concentration2,Concentration3)
+
 LNconc<-log(Conc)
-Time<-c(Time1,Time2,Time3)
 require(stats)
 reg<-lm(LNconc~Time)
 coeff=coefficients(reg)
@@ -122,10 +234,11 @@ CLBMnormSC=round(CLBMnormSC,2)
 a=paste0("Iohexol clearance =", CLBM, "mL/min")
 b=paste0("Iohexol clearance normalised at BMI =",CLBMnormSC, "mL/min/1.73m²")
 
-Names<-c("Iohexol clearance =","Iohexol clearance normalised at BMI =")
-Results<- c(CLBM,CLBMnormSC)
-Unit<-c("mL/min","mL/min/1.73m²")
+Names<-c("Iohexol clearance =","BSA-indexed Iohexol clearance  =","Type de test","BSA calcul type","Number of concentration known","Height","Weight","BSA", "Omnipaque type","Omnipaque volume","Syringe weight before", "Syringe weight after","Concentration1","Concentration2","Concentration3","Concentration4","Concentration5","Time1","Time2","Time3","Time4","Time5")
+Results<- c(CLBM,CLBMnormSC, Test, Ped , Concnr , Height , Weight ,BSA , Omnipaque_type , Omnipaque_volume, syringe_weight_before ,syringe_weight_after , Concentration1 ,Concentration2 ,Concentration3 ,Concentration4 ,Concentration5 ,Time1 ,Time2 ,Time3 ,Time4 ,Time5  )
+Unit<-c("mL/min","mL/min/1.73m²", "","numeric","", "cm", "Kg", "kg/m²", "Type in mg/mL", "mL", "g","g","mg/L","mg/L","mg/L","mg/L","mg/L","min","min","min","min","min")
 
 Names<-cbind(Names,Results,Unit)
-rownames(Names)=c(1,2)
+#rownames(Names)=c(1,2)
 View(Names)
+
